@@ -1,0 +1,3 @@
+[submodule "cpcommon"]
+	path = cpcommon
+	url = https://github.com/confpack/cpcommon.git
