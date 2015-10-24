@@ -3,7 +3,7 @@ from __future__ import print_function
 
 import sys
 
-import confpacker
+import libconfpacker
 from cpcommon.cmdline import Cmdline
 
 SCRIPT_NAMES = {"confpacker", "confpacker.py"}
