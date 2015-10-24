@@ -7,7 +7,7 @@ import sys
 
 from cpcommon import verify_directory_exists_or_sysexit, Command
 
-from .. import packager
+from .. import packagers
 
 
 class BuildMain(Command):
@@ -15,7 +15,6 @@ class BuildMain(Command):
     self.argparser = argparse.ArgumentParser(description="Builds packages from a provisioning directory")
     self.argparser.add_argument("-d", "--directory", nargs="?", default=".", help="the path to the directory with all provisioning files. Default: current working directory")
     self.argparser.add_argument("-o", "--output", nargs="?", default="out/", help="the package output directory. Default: `pwd`/out")
-    self.argparser.add_argument("-t", "--type", nargs="?", default="deb", choices=packager.types.keys(), help="the type of package to output")
     self.argparser.add_argument("packages", nargs="*", default=[], help="the list of packages to build. Default: builds all packages")
     self.argparser.prog = self.argparser.prog + " setup_environment"
 
@@ -48,7 +47,7 @@ class BuildMain(Command):
 
         package_paths[dirname] = package_path
 
-    packer = packager.types[args.type](args.directory, args.output)
-    build_id, outdir = packer.build(package_paths)
+    build_id, outdir = packagers.build(args.directory, args.output)
+    print("built {} at {}".format(build_id, outdir))
 
     return 0

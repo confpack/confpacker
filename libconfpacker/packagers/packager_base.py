@@ -1,9 +1,13 @@
+from __future__ import absolute_import
+
 from datetime import datetime
 import os
 import os.path
 import subprocess
 
 from cpcommon import cd
+
+from .package import Package
 
 
 class PackagerBase(object):
@@ -25,7 +29,14 @@ class PackagerBase(object):
   def get_timestamp(self):
     return datetime.now().strftime("%Y%m%d%H%M%S")
 
-  def build(self, packages):
+  def build(self, packages=None):
+    if packages is None:
+      packages = {}
+      for n in os.listdir(self.source_directory):
+        path = os.path.join(self.source_directory, n)
+        if os.path.isdir(path):
+          packages[n] = path
+
     timestamp = self.get_timestamp()
     git_sha = self.get_source_git_sha()
 
@@ -39,7 +50,8 @@ class PackagerBase(object):
 
     os.mkdir(this_out_dir)
 
-    for package, source_path in packages.iteritems():
+    for package_name, source_path in packages.iteritems():
+      package = Package(package_name, source_path)
       self.build_one(package, source_path, timestamp, git_sha, this_out_dir)
 
     return build_id, this_out_dir
