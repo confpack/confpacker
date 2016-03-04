@@ -1,0 +1,5 @@
+---
+packages_prefix: test1-
+types:
+  - deb
+

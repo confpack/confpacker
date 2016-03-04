@@ -1,28 +1,25 @@
 from __future__ import absolute_import
 
-import os.path
-
-import yaml
+import logging
 
 from .deb import DebianPackager
-from .exceptions import InvalidInputError
+from .build_config import BuildConfig
 
-packagers = {
+
+SUPPORT_PACKAGERS = {
   "deb": DebianPackager
 }
 
-
-class BuildConfig(object):
-  def __init__(self, filename):
-    with open(filename) as f:
-      self.options = yaml.load(f.read())
+logger = logging.getLogger("confpacker")
 
 
-def build(src_dir, out_dir):
-  build_config = BuildConfig(os.path.join(src_dir, "config.yml"))
-  build_packagers = []
-  for pt in build_config.get("types", ["deb"]):
-    if pt not in packagers:
-      raise InvalidInputError("{} is not a valid type. valid ones are: {}".format(pt, packagers.keys()))
+def build(src_directory, out_directory, packages=[]):
+  bc = BuildConfig(src_directory, packcages=packages)
+  for packager_names in bc.config["types"]:
+    for packager_name in packager_names:
+      if packager_name not in SUPPORT_PACKAGERS:
+        logger.warn("{} is not a valid packager. supported are: {}".format(packager_name, SUPPORT_PACKAGERS))
+        continue
 
-    build_packagers.append(packagers[pt])
+    packager = SUPPORT_PACKAGERS[packager_name](bc, out_directory)
+    packager.build()

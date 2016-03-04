@@ -1,0 +1,8 @@
+---
+- file: path=/etc/nginx/sites-available/default
+        state=absent
+
+- name: linking serverid
+  file: src=/etc/nginx/sites-available/serverid
+        dest=/etc/nginx/sites-enabled/serverid
+        state=link

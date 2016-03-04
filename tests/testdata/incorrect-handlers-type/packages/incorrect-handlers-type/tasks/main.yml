@@ -1,0 +1,4 @@
+---
+- name: test
+  file: path=/etc/abc.conf
+        mode=0600

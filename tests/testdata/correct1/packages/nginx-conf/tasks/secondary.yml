@@ -1,0 +1,4 @@
+---
+- file: path=/etc/nginx/sites-available/secondary
+        state=absent
+

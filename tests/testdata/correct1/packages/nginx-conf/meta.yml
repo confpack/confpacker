@@ -1,0 +1,3 @@
+---
+system_pkg_dependency:
+  - name: nginx
