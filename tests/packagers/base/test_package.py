@@ -21,17 +21,26 @@ class TestPackage(helpers.ConfpackerTestCase):
     self.assertEqual({"server_name": "{{ confpacker_fqdn }}"}, package.vars)
 
     self.assertEqual(2, len(package.main_tasks))
-    self.assertEqual({"file": "path=/etc/nginx/sites-available/default state=absent"}, package.main_tasks[0])
-    self.assertEqual({"file": "src=/etc/nginx/sites-available/serverid dest=/etc/nginx/sites-enabled/serverid state=link", "name": "linking serverid"}, package.main_tasks[1])
+    self.assertEqual("file", package.main_tasks[0].action)
+    self.assertEqual("path=/etc/nginx/sites-available/default state=absent", package.main_tasks[0].action_args)
+    self.assertEqual("file", package.main_tasks[1].action)
+    self.assertEqual("src=/etc/nginx/sites-available/serverid dest=/etc/nginx/sites-enabled/serverid state=link", package.main_tasks[1].action_args)
+    self.assertEqual("linking serverid", package.main_tasks[1].name)
 
     self.assertEqual({"name": "restart nginx", "service": "name=nginx state=restarted"}, package.main_handlers[0])
     self.assertEqual(2, len(package.files))
-    files = set(package.files)
-    self.assertTrue("/etc/nginx/sites-available/serverid" in files)
-    self.assertTrue("/etc/nginx/ssl.conf" in files)
+
+    files = {target_path: real_path for real_path, target_path in package.files}
+
+    serverid_path = "/etc/nginx/sites-available/serverid"
+    sslconf_path = "/etc/nginx/ssl.conf"
+    self.assertEqual(package.src_directory + "/files" + serverid_path, files[serverid_path])
+    self.assertEqual(package.src_directory + "/files" + sslconf_path, files[sslconf_path])
 
     self.assertEqual(1, len(package.templates))
-    self.assertEqual(["/etc/nginx/nginx.conf"], package.templates)
+    self.assertEqual([(package.src_directory + "/templates/etc/nginx/nginx.conf", "/etc/nginx/nginx.conf")], package.templates)
+
+    self.assertEqual(os.path.join(helpers.CORRECT1_PATH, "packages", "nginx-conf"), package.src_directory)
 
   def test_package_should_raise_if_handlers_is_wrong_type(self):
     with self.assertRaises(TypeError):

@@ -1,3 +1,4 @@
 ---
 system_pkg_dependency:
   - name: nginx
+description: nginx configurations

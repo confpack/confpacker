@@ -23,6 +23,7 @@ class BasePackagerTest(BasePackager):
 
 class TestBasePackager(helpers.ConfpackerTestCase):
   def setUp(self):
+    helpers.ConfpackerTestCase.setUp(self)
     self.bc = BuildConfig(helpers.CORRECT1_PATH)
     self.packager = BasePackagerTest(self.bc, helpers.DEFAULT_OUTDIR)
 

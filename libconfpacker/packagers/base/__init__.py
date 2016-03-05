@@ -10,6 +10,8 @@ import yaml
 
 from cpcommon import cd
 
+from .task import Task
+
 
 class Package(object):
   def src_path(self, *path):
@@ -53,7 +55,7 @@ class Package(object):
 
   def load_tasks(self, filename="main.yml", ignore_error=False):
     tasks_path = self.src_path("tasks", filename)
-    return self._load_yml_file(tasks_path, list, ignore_error=ignore_error)
+    return [Task(rt) for rt in self._load_yml_file(tasks_path, list, ignore_error=ignore_error)]
 
   def load_handlers(self, filename="main.yml", ignore_error=False):
     handlers_path = self.src_path("handlers", filename)
@@ -77,12 +79,12 @@ class Package(object):
       for filename in files_in_dir:
         path = os.path.join(root, filename)
         if path.startswith(base_path):
-          path = path[len(base_path):]
+          target_path = path[len(base_path):]
         else:
           # TODO: This may happen for a symlink. Need to be investigated
           raise RuntimeError("file path {} does not start with src directory path {}?".format(path, self.src_directory))
 
-        files.append(path)
+        files.append((path, target_path))
 
     return files
 
@@ -97,7 +99,7 @@ class BasePackager(object):
   def __init__(self, build_config, output_dir):
     self.logger = logging.getLogger("confpacker")
     self.build_config = build_config
-    self.output_dir = output_dir
+    self.output_dir = os.path.abspath(output_dir)
 
     if not os.path.exists(self.output_dir):
       os.mkdir(self.output_dir)
@@ -133,7 +135,13 @@ class BasePackager(object):
     os.mkdir(this_out_dir)
     for pkg_name, pkg_src_path in self.build_config.package_paths.items():
       package = Package(pkg_name, pkg_src_path, build_version)
-      self.build_one(package, build_version, this_out_dir)
+      this_package_out_dir = os.path.join(this_out_dir, pkg_name)
+      os.mkdir(this_package_out_dir)
+      self.build_one(package, build_version, this_package_out_dir)
 
   def build_one(self, package, build_version, out_dir):
+    """Builds one package
+
+    out_dir is for this package. The final should emit a file at <out_dir>/package.<typename>
+    """
     raise NotImplementedError

@@ -17,7 +17,7 @@ class TestBuildConfig(helpers.ConfpackerTestCase):
     self.assertEqual(os.path.join(helpers.CORRECT1_PATH, "packages", "nginx-conf"), bc.package_paths["nginx-conf"])
     self.assertEqual(os.path.join(helpers.CORRECT1_PATH, "packages", "example-com-conf"), bc.package_paths["example-com-conf"])
 
-    self.assertEqual({"packages_prefix": "test1-", "types": ["deb"]}, bc.config)
+    self.assertEqual({"packages_prefix": "test1-", "types": ["deb"], "maintainer": "John Doe <john.doe@example.com>"}, bc.config)
 
   def test_fail_build_config_with_incorrect_config_yml(self):
     with self.assertRaises(NoBacktraceError):

@@ -2,4 +2,4 @@
 packages_prefix: test1-
 types:
   - deb
-
+maintainer: John Doe <john.doe@example.com>

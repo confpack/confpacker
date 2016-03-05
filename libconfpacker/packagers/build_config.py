@@ -10,7 +10,8 @@ from cpcommon.exceptions import NoBacktraceError
 
 REQUIRED_CONFIG_KEYS = {
   "packages_prefix": str,
-  "types":           list
+  "types":           list,
+  "maintainer":      str,
 }
 
 
